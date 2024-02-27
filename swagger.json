@@ -1,0 +1,3718 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": "TaskPro",
+    "description": "TaskPro backend",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    { "url": "http://localhost:3000" },
+    { "url": "https://protask-backend.onrender.com" }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authorization endpoints"
+    },
+    {
+      "name": "User",
+      "description": "User endpoints"
+    },
+    {
+      "name": "Wallpaper",
+      "description": "Wallpaper endpoints"
+    },
+    {
+      "name": "Board",
+      "description": "Board endpoints"
+    },
+    {
+      "name": "Column",
+      "description": "Column endpoints"
+    },
+    {
+      "name": "Card",
+      "description": "Card endpoints"
+    },
+    {
+      "name": "Help",
+      "description": "Help endpoints"
+    }
+  ],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign up new user - User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object <br># Parameters description:<br>**userName** - string, name of user.<br>**email** - string, email of user.<br>**password** - string, secret password of user.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Provided email already exists",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UserConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/signin": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign in existing user",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login's object <br># Parameters description:<br>**email** - string, email of user.<br>**password** - string, secret password of user.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update current logged in user.",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Updated user's object <br># Parameters description:<br>**userName** - string, name of user.<br>**email** - string, email of user.<br>**password** - string, secret password of user, <br>**theme** - string, one of the list theme of board: [light, dark, violet].",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout existing user",
+        "description": "The logout endpoint is a system exit mechanism that terminates the user's session and destroys the access token that was issued during the previous authentication.<br><br>Description: When a user clicks the logout button, it requests the URL /api/auth/logout with a valid token in the Authorization header.<br>The server checks the validity of the token, if the token is valid, the user's session is closed, the token is removed and the user is returned to the login page. <br>If the token is not valid, the server returns a 401 status and reports that the token is invalid.",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/current": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get current user info",
+        "description": "The \"current\" endpoint is used to retrieve information about the current authorized user.<br>This endpoint returns status, code, message and an object that contains information about the user, such as userName, email, theme, avatarCloudURL.",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUser"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/profile": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Updated user profile",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Updated user object <br># Parameters description:<br>**userName** - string, name of user.<br>**email** - string, email of user.<br>**newPassword** - string, secret newPassword of user.<br>**currentPassword** - string, secret currentPassword of user.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+                "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BadRequest"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UserBadDataPassword"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Provided email already exists",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UserConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/theme": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Update user theme",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "User theme<br># Parameters description:<br>**theme** - string, one of the list theme of board: [light, dark, violet].",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserThemeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserThemeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+                "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/avatar": {
+      "patch": {
+        "tags": ["User"],
+        "summary": "Update user avatar",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "User avatar<br># Parameters description:<br>**avatar** - binary, image for user profile avatar.",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["avatar"],
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserAvatarResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Error: Unsupported Media Type",
+            "content": {
+                "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnsupportedMediaType"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/wallpaper/": {
+      "get": {
+        "tags": ["Wallpaper"],
+        "summary": "Get all wallpapers",
+        "description": "Get all wallpapers.",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllWallpapersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boards/": {
+      "get": {
+        "tags": ["Board"],
+        "summary": "Get all boards",
+        "description": "Get all boards.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of page"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of boards per page"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllBoardsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Board"],
+        "summary": "Add new board",
+        "description": "Add new board.",
+        "parameters": [],
+        "requestBody": {
+          "description": "New board object <br># Parameters description:<br>**title** - string, name of board.<br>**icon** - string, icon on board, one item from the list: ['project','star','loading','puzzle','container','lightning','colors','hexagon'].<br>**backgroundImg** - string or null, wallpaper ID one of the list: <br>[<br>null,<br>'65bd63bfbe42db36576cef07',<br>'65bd64121f0dd29462525104',<br>'65bd646ad035ace54f9fbacc',<br>'65bd64a469dbfedb2b4fa649',<br>'65bd64fd19bce60b401cf9d0',<br>'65bd65322d32baf543f90857',<br>'65bd65616080dd83c4663229',<br>'65bd65dcd834d8796ff702d2',<br>'65bd662514ed70443b11a44c',<br>'65bd66635e770c355ed96f01',<br>'65bd669ae0b3b2e70db649aa',<br>'65bd66cd66783926d5bb0d2f',<br>'65bd66fb61efbfb9a9bcc0a9',<br>'65bd672d2dd95dfda4b5dc66',<br>'65bd67578697af865db4fbf7'<br>]",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBoardRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBoardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boards/{id}": {
+      "get": {
+        "tags": ["Board"],
+        "summary": "Get board by id",
+        "description": "Get board by id.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of board"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBoardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundBoard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Board"],
+        "summary": "Update board by ID",
+        "description": "Update board by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of board"
+          }
+        ],
+        "requestBody": {
+          "description": "Updated board object <br># Parameters description:<br>**title** - string, name of board.<br>**icon** - string, icon on board, one item from the list: ['project','star','loading','puzzle','container','lightning','colors','hexagon'].<br>**backgroundImg** - string or null, wallpaper ID one of the list: <br>[<br>null,<br>'65bd63bfbe42db36576cef07',<br>'65bd64121f0dd29462525104',<br>'65bd646ad035ace54f9fbacc',<br>'65bd64a469dbfedb2b4fa649',<br>'65bd64fd19bce60b401cf9d0',<br>'65bd65322d32baf543f90857',<br>'65bd65616080dd83c4663229',<br>'65bd65dcd834d8796ff702d2',<br>'65bd662514ed70443b11a44c',<br>'65bd66635e770c355ed96f01',<br>'65bd669ae0b3b2e70db649aa',<br>'65bd66cd66783926d5bb0d2f',<br>'65bd66fb61efbfb9a9bcc0a9',<br>'65bd672d2dd95dfda4b5dc66',<br>'65bd67578697af865db4fbf7'<br>]",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBoardRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateBoardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundBoard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Board"],
+        "summary": "Delete board by ID",
+        "description": "Delete board by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of board"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteBoardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundBoard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/columns/": {
+      "get": {
+        "tags": ["Column"],
+        "summary": "Get all columns",
+        "description": "Get all columns.",
+        "parameters": [
+          {
+            "name": "boardId",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "description": "ID of board"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of page"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of column per page"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllColumnsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundBoard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Column"],
+        "summary": "Add new column",
+        "description": "Add new column.",
+        "parameters": [],
+        "requestBody": {
+          "description": "New column object <br># Parameters description:<br>**title** - string, name of column.<br>**boardId** - string, ID of specific board to which a new column can be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateColumnRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateColumnResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadDataBoardId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/columns/{id}": {
+      "get": {
+        "tags": ["Column"],
+        "summary": "Get column by ID",
+        "description": "Get column by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of column"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetColumnResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundColumn"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Column"],
+        "summary": "Update column by ID",
+        "description": "Update column by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of column"
+          }
+        ],
+        "requestBody": {
+          "description": "Updated column object <br># Parameters description:<br>**title** - string, name of column.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateColumnRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateColumnResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundColumn"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Column"],
+        "summary": "Delete column by ID",
+        "description": "Delete column by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of Column"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteColumnResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundColumn"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards/": {
+      "get": {
+        "tags": ["Card"],
+        "summary": "Get all cards",
+        "description": "Get all cards.",
+        "parameters": [
+          {
+            "name": "columnId",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "description": "ID of column"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of page"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "Number of Card per page"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllCardsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundColumn"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Card"],
+        "summary": "Add new Card",
+        "description": "Add new Card.",
+        "parameters": [],
+        "requestBody": {
+          "description": "New Card object <br># Parameters description:<br>**title** - string, name of Card. **Required field**<br>**description** - string, description of Card.<br>**priority** - string, priority of Card, one of the list: ['without', 'low', 'medium', 'high'].<br>**deadline** - string or null, final Date when card should be done.<br>**columnId** - string, ID of specific column to which a new Card can be added. **Required field**",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCardRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadDataColumnId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards/{id}": {
+      "get": {
+        "tags": ["Card"],
+        "summary": "Get card by ID",
+        "description": "Get card by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of card"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundCard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Card"],
+        "summary": "Update card by ID",
+        "description": "Update card by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of card"
+          }
+        ],
+        "requestBody": {
+          "description": "Updated card object <br># Parameters description:<br>**title** - string, name of Card.<br>**description** - string, description of Card.<br>**priority** - string, priority of Card, one of the list: ['without', 'low', 'medium', 'high'].<br>**deadline** - string or null, final Date when card should be done.<br>**columnId** - string, ID of specific column to which a new Card can be added.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCardRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateCardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundCard"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Card"],
+        "summary": "Delete Card by ID",
+        "description": "Delete Card by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of Card"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteCardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/BadId"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundCard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cards/{id}/changecolumn": {
+      "patch": {
+        "tags": ["Card"],
+        "summary": "Change card's column",
+        "description": "Change card's column.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of card"
+          }
+        ],
+        "requestBody": {
+          "description": "Card's column ID <br># Parameters description:<br>**columnId** - string, ID of specific column to which a Card can be moved.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchCardRequest"
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatchCardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                  "schema": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/BadId"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BadRequest"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BadDataCardMove"
+                      }
+                    ]
+                  }
+                }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/NotFoundCard"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/needhelp/": {
+      "post": {
+        "tags": ["Help"],
+        "summary": "Send help request to support service",
+        "description": "Send help request to support service.",
+        "parameters": [],
+        "requestBody": {
+          "description": "Need help message <br># Parameters description:<br>**email** - string, sender email.**Required field**<br>**comment** - string, the message about problem.**Required field**",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                      "type": "string",
+                      "description": "User's email",
+                      "format": "email"
+                  },
+                  "comment": {
+                      "type": "string",
+                      "description": "User's comment",
+                      "example": "Hello, I need help with my account!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Response message",
+                      "example": "Your comment has been sent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number",
+                      "description": "Response status",
+                      "example": 400
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Response code",
+                      "example": "bad_params"
+                    },
+                     "message": {
+                      "type": "string",
+                      "description": "Response message",
+                      "example": "'email' with value 'test' fails to match the required pattern: /^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$/"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized Token",
+            "content": {
+                "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedToken"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["userName", "email", "password"],
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "User's name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 201
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "created"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Created success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                        "type": "string",
+                        "description": "JWT token",
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmZlZDgxNDI3MzY5MTFiMzFkOTgxYSIsImlhdCI6MTcwNzA3Njk5MywiZXhwIjoxNzA3MTU5NzkzfQ.vSQrEepSMfbSBu1-DGq5KJmGjPiCqXzXTeY0Cr0vL9k"
+                    }
+                }
+            }
+        },
+        "example": {
+            "status": 201,
+            "code": "created",
+            "message": "Created success",
+            "data": {
+                "user": {
+                    "userName": "John Doe",
+                    "email": "user@example.com",
+                    "theme": "light",
+                    "avatarCloudURL": null
+                },
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmZlZDgxNDI3MzY5MTFiMzFkOTgxYSIsImlhdCI6MTcwNzA3Njk5MywiZXhwIjoxNzA3MTU5NzkzfQ.vSQrEepSMfbSBu1-DGq5KJmGjPiCqXzXTeY0Cr0vL9k"
+            }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_login_success"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "User is logged in"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "token": {
+                        "type": "string",
+                        "description": "JWT token",
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmZlZDgxNDI3MzY5MTFiMzFkOTgxYSIsImlhdCI6MTcwNzA3Njk5MywiZXhwIjoxNzA3MTU5NzkzfQ.vSQrEepSMfbSBu1-DGq5KJmGjPiCqXzXTeY0Cr0vL9k"
+                    }
+                }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "user_login_success",
+            "message": "User is logged in",
+            "data": {
+                "user": {
+                    "userName": "John Doe",
+                    "email": "user@example.com",
+                    "theme": "light",
+                    "avatarCloudURL": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+                },
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmZlZDgxNDI3MzY5MTFiMzFkOTgxYSIsImlhdCI6MTcwNzA3Njk5MywiZXhwIjoxNzA3MTU5NzkzfQ.vSQrEepSMfbSBu1-DGq5KJmGjPiCqXzXTeY0Cr0vL9k"
+            }
+        }
+      },
+      "CurrentUser": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_authorized"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "User is authorized"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "user_authorized",
+            "message": "User is authorized",
+            "data": {
+                "user": {
+                    "userName": "John Doe",
+                    "email": "user@example.com",
+                    "theme": "light",
+                    "avatarCloudURL": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+                }
+            }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "User's name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "qwerty123"
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "dark",
+              "violet"
+            ],
+            "description": "User's theme",
+            "example": "light"
+          }
+        }
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_update_success"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Updated success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "user_update_success",
+            "message": "Updated success",
+            "data": {
+                "user": {
+                    "userName": "John Doe",
+                    "email": "user@example.com",
+                    "theme": "dark",
+                    "avatarCloudURL": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+                }
+            }
+        }
+      },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_logout"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "User is logged out"
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "user_logout",
+            "message": "User is logged out"
+        }
+      },
+      "UpdateUserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "User's name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "qwerty123456"
+          },
+          "currentPassword": {
+            "type": "string",
+            "description": "User's current Password",
+            "example": "qwerty123"
+          }
+        }
+      },
+      "UpdateUserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "user_update_success"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Updated success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "object",
+                "properties": {
+                  "userName": {
+                    "type": "string",
+                    "description": "User's name",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                      "type": "string",
+                      "description": "User's email",
+                      "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "status": 200,
+          "code": "user_update_success",
+          "message": "Updated success",
+          "data": {
+            "user": {
+                "userName": "John Doe",
+                "email": "user@example.com"
+            }
+          }
+        }
+      },
+      "UserBadDataPassword": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Bad request status",
+              "example": 400
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "bad_data"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Password is required"
+          }
+        }
+      },
+      "UpdateUserThemeRequest": {
+        "type": "object",
+        "properties": {
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "dark",
+              "violet"
+            ],
+            "description": "User's theme",
+            "example": "light"
+          }
+        }
+      },
+      "UpdateUserThemeResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_update_success"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Updated success"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "theme": {
+                  "type": "string",
+                  "enum": [
+                    "light",
+                    "dark",
+                    "violet"
+                  ],
+                  "description": "User's theme",
+                  "example": "light"
+                }
+              }
+            }
+        },
+        "example": {
+          "status": 200,
+          "code": "user_update_success",
+          "message": "Updated success",
+          "data": {
+            "theme": "violet"
+          }
+        }
+      },
+      "UpdateUserAvatarResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_update_success"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Updated success"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "avatarCloudURL": {
+                  "type": "string",
+                  "description": "User's avatar",
+                  "example": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+                }
+              }
+            }
+        },
+        "example": {
+          "status": 200,
+          "code": "user_update_success",
+          "message": "Updated success",
+          "data": {
+            "avatarCloudURL": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+          }
+        }
+      },
+      "UnsupportedMediaType": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Unsupported Media Type",
+              "example": 415
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "File should be only image"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "File should be only image"
+          }
+        }
+      },
+      "BadRequest": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Bad request status",
+                "example": 400
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "bad_params"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Params is wrong or has wrong type"
+            }
+        }
+      },
+      "UserConflict": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 409
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_already_exist"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Email already exists"
+            }
+        }
+      },
+      "Unauthorized": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 401
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_unauthorized_by"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Email or password is wrong"
+            }
+        }
+      },
+      "UnauthorizedToken": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 401
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "user_unauthorized_token"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "User is not authorized"
+            }
+        }
+      },
+      "GetAllWallpapersResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "ok"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Wallpaper's ID",
+                  "example": "65bd63bfbe42db36576cef07"
+                },
+                "desktopCloudURL": {
+                  "type": "string",
+                  "description": "Wallpaper's desktop cloud URL",
+                  "example": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908680/wallpapers/bg_desktop_optimize/bg9_desktop_hxjgym.jpg"
+                },
+                "tabletCloudURL": {
+                  "type": "string",
+                  "description": "Wallpaper's tablet cloud URL",
+                  "example": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908676/wallpapers/bg_tablet_optimize/bg9_tablet_m8lpsv.jpg"
+                },
+                "mobileCloudURL": {
+                  "type": "string",
+                  "description": "Wallpaper's mobile cloud URL",
+                  "example": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908669/wallpapers/bg_mobile_optimize/bg12_mobile_rympkb.jpg"
+                },
+                "iconCloudURL": {
+                  "type": "string",
+                  "description": "Wallpaper's icon cloud URL",
+                  "example": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908667/wallpapers/bg_icons/bg7_icon_yfeouz.jpg"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "status": 200,
+          "code": "ok",
+          "message": "Success",
+          "data": [
+            {
+                "_id": "65bd63bfbe42db36576cef07",
+                "desktopCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908680/wallpapers/bg_desktop_optimize/bg9_desktop_hxjgym.jpg",
+                "tabletCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908676/wallpapers/bg_tablet_optimize/bg9_tablet_m8lpsv.jpg",
+                "mobileCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908669/wallpapers/bg_mobile_optimize/bg12_mobile_rympkb.jpg",
+                "iconCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908667/wallpapers/bg_icons/bg7_icon_yfeouz.jpg"
+            },
+            {
+                "_id": "65bd64121f0dd29462525104",
+                "desktopCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908679/wallpapers/bg_desktop_optimize/bg8_desktop_zckerz.jpg",
+                "tabletCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908675/wallpapers/bg_tablet_optimize/bg8_tablet_fkrlfx.jpg",
+                "mobileCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908669/wallpapers/bg_mobile_optimize/bg15_mobile_ozylqj.jpg",
+                "iconCloudURL": "https://res.cloudinary.com/duzywelcr/image/upload/v1706908665/wallpapers/bg_icons/bg4_icon_emsvg7.jpg"
+            }
+          ]
+        }
+      },
+      "GetAllBoardsResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "ok"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Success"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "description": "Board's ID",
+                    "example": "65c280d17eb9882dc202fc16"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Board's title",
+                    "example": "Board 1"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "enum": [ 
+                      "project",
+                      "star",
+                      "loading",
+                      "puzzle",
+                      "container",
+                      "lightning",
+                      "colors",
+                      "hexagon"
+                    ],
+                    "description": "Board's icon",
+                    "example": "project"
+                  },
+                "backgroundImg": {
+                  "type": "string",
+                  "enum": [
+                    "null",
+                    "65bd63bfbe42db36576cef07",
+                    "65bd64121f0dd29462525104",
+                    "65bd646ad035ace54f9fbacc",
+                    "65bd64a469dbfedb2b4fa649",
+                    "65bd64fd19bce60b401cf9d0",
+                    "65bd65322d32baf543f90857",
+                    "65bd65616080dd83c4663229",
+                    "65bd65dcd834d8796ff702d2",
+                    "65bd662514ed70443b11a44c",
+                    "65bd66635e770c355ed96f01",
+                    "65bd669ae0b3b2e70db649aa",
+                    "65bd66cd66783926d5bb0d2f",
+                    "65bd66fb61efbfb9a9bcc0a9",
+                    "65bd672d2dd95dfda4b5dc66",
+                    "65bd67578697af865db4fbf7"
+                  ],
+                  "description": "Board's background image",
+                  "example": "65bd67578697af865db4fbf7"
+                },
+                "owner": {
+                    "$ref": "#/components/schemas/PopulatedUser"
+                  }
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": [
+              {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "Board 1",
+                "icon": "project",
+                "backgroundImg": "65bd67578697af865db4fbf7",
+                "owner": {
+                    "_id": "65be3614cd039701052f2de9",
+                    "userName": "John Doe"
+                }
+              },
+              {
+                "_id": "65c2827c12f5f1bb4e53b1cd",
+                "title": "Board 2",
+                "icon": "star",
+                "backgroundImg": "65bd67578697af865db4fbf7",
+                "owner": {
+                    "_id": "65be3614cd039701052f2de9",
+                    "userName": "John Doe"
+                }
+              }
+            ]
+        }
+      },
+      "GetBoardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "ok"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Success"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Board's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Board's title",
+                  "example": "Board 1"
+                },
+                "icon": {
+                  "type": "string",
+                  "enum": [ 
+                    "project",
+                    "star",
+                    "loading",
+                    "puzzle",
+                    "container",
+                    "lightning",
+                    "colors",
+                    "hexagon"
+                  ],
+                  "description": "Board's icon",
+                  "example": "project"
+                },
+                "backgroundImg": {
+                  "type": "string",
+                  "enum": [
+                    "null",
+                    "65bd63bfbe42db36576cef07",
+                    "65bd64121f0dd29462525104",
+                    "65bd646ad035ace54f9fbacc",
+                    "65bd64a469dbfedb2b4fa649",
+                    "65bd64fd19bce60b401cf9d0",
+                    "65bd65322d32baf543f90857",
+                    "65bd65616080dd83c4663229",
+                    "65bd65dcd834d8796ff702d2",
+                    "65bd662514ed70443b11a44c",
+                    "65bd66635e770c355ed96f01",
+                    "65bd669ae0b3b2e70db649aa",
+                    "65bd66cd66783926d5bb0d2f",
+                    "65bd66fb61efbfb9a9bcc0a9",
+                    "65bd672d2dd95dfda4b5dc66",
+                    "65bd67578697af865db4fbf7"
+                  ],
+                  "description": "Board's background image",
+                  "example": "65bd67578697af865db4fbf7"
+                },
+                "owner": {
+                  "$ref": "#/components/schemas/PopulatedUser"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": {
+              "_id": "65c280d17eb9882dc202fc16",
+              "title": "Board 1",
+              "icon": "project",
+              "backgroundImg": "65bd67578697af865db4fbf7",
+              "owner": {
+                  "_id": "65be3614cd039701052f2de9",
+                  "userName": "John Doe"
+              }
+            }
+        }
+      },
+      "CreateBoardRequest": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Board's title",
+            "example": "Board 1"
+          },
+          "icon": {
+            "type": "string",
+            "enum": [ 
+              "project",
+              "star",
+              "loading",
+              "puzzle",
+              "container",
+              "lightning",
+              "colors",
+              "hexagon"
+            ],
+            "description": "Board's icon",
+            "example": "project"
+          },
+          "backgroundImg": {
+            "type": "string",
+            "enum": [
+              "null",
+              "65bd63bfbe42db36576cef07",
+              "65bd64121f0dd29462525104",
+              "65bd646ad035ace54f9fbacc",
+              "65bd64a469dbfedb2b4fa649",
+              "65bd64fd19bce60b401cf9d0",
+              "65bd65322d32baf543f90857",
+              "65bd65616080dd83c4663229",
+              "65bd65dcd834d8796ff702d2",
+              "65bd662514ed70443b11a44c",
+              "65bd66635e770c355ed96f01",
+              "65bd669ae0b3b2e70db649aa",
+              "65bd66cd66783926d5bb0d2f",
+              "65bd66fb61efbfb9a9bcc0a9",
+              "65bd672d2dd95dfda4b5dc66",
+              "65bd67578697af865db4fbf7"
+            ],
+            "description": "Board's background image",
+            "example": "65bd67578697af865db4fbf7"
+          }
+        }
+      },
+      "CreateBoardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 201
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "created"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Board created successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Board's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Board's title",
+                  "example": "Board 1"
+                },
+                "icon": {
+                  "type": "string",
+                  "enum": [ 
+                    "project",
+                    "star",
+                    "loading",
+                    "puzzle",
+                    "container",
+                    "lightning",
+                    "colors",
+                    "hexagon"
+                  ],
+                  "description": "Board's icon",
+                  "example": "project"
+                },
+                "backgroundImg": {
+                  "type": "string",
+                  "enum": [
+                    "null",
+                    "65bd63bfbe42db36576cef07",
+                    "65bd64121f0dd29462525104",
+                    "65bd646ad035ace54f9fbacc",
+                    "65bd64a469dbfedb2b4fa649",
+                    "65bd64fd19bce60b401cf9d0",
+                    "65bd65322d32baf543f90857",
+                    "65bd65616080dd83c4663229",
+                    "65bd65dcd834d8796ff702d2",
+                    "65bd662514ed70443b11a44c",
+                    "65bd66635e770c355ed96f01",
+                    "65bd669ae0b3b2e70db649aa",
+                    "65bd66cd66783926d5bb0d2f",
+                    "65bd66fb61efbfb9a9bcc0a9",
+                    "65bd672d2dd95dfda4b5dc66",
+                    "65bd67578697af865db4fbf7"
+                  ],
+                  "description": "Board's background image",
+                  "example": "65bd67578697af865db4fbf7"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Owner's ID",
+                  "example": "65be3614cd039701052f2de9"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "description": "Board created at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "description": "Board updated at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 201,
+            "code": "created",
+            "message": "Board created successfully",
+            "data": {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "Board 1",
+                "icon": "project",
+                "backgroundImg": "65bd67578697af865db4fbf7",
+                "owner": "65be3614cd039701052f2de9",
+                "createdAt": "2024-02-06T19:03:24.206Z",
+                "updatedAt": "2024-02-06T19:03:24.206Z"
+              }
+        }
+      },
+      "UpdateBoardRequest": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Board's title",
+            "example": "Board 1"
+          },
+          "icon": {
+            "type": "string",
+            "enum": [ 
+              "project",
+              "star",
+              "loading",
+              "puzzle",
+              "container",
+              "lightning",
+              "colors",
+              "hexagon"
+            ],
+            "description": "Board's icon",
+            "example": "project"
+          },
+          "backgroundImg": {
+            "type": "string",
+            "enum": [
+              "null",
+              "65bd63bfbe42db36576cef07",
+              "65bd64121f0dd29462525104",
+              "65bd646ad035ace54f9fbacc",
+              "65bd64a469dbfedb2b4fa649",
+              "65bd64fd19bce60b401cf9d0",
+              "65bd65322d32baf543f90857",
+              "65bd65616080dd83c4663229",
+              "65bd65dcd834d8796ff702d2",
+              "65bd662514ed70443b11a44c",
+              "65bd66635e770c355ed96f01",
+              "65bd669ae0b3b2e70db649aa",
+              "65bd66cd66783926d5bb0d2f",
+              "65bd66fb61efbfb9a9bcc0a9",
+              "65bd672d2dd95dfda4b5dc66",
+              "65bd67578697af865db4fbf7"
+            ],
+            "description": "Board's background image",
+            "example": "65bd67578697af865db4fbf7"
+          }
+        }
+      },
+      "UpdateBoardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "updated"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Board updated successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Board's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Board's title",
+                  "example": "Board 1"
+                },
+                "icon": {
+                  "type": "string",
+                  "enum": [ 
+                    "project",
+                    "star",
+                    "loading",
+                    "puzzle",
+                    "container",
+                    "lightning",
+                    "colors",
+                    "hexagon"
+                  ],
+                  "description": "Board's icon",
+                  "example": "project"
+                },
+                "backgroundImg": {
+                  "type": "string",
+                  "enum": [
+                    "null",
+                    "65bd63bfbe42db36576cef07",
+                    "65bd64121f0dd29462525104",
+                    "65bd646ad035ace54f9fbacc",
+                    "65bd64a469dbfedb2b4fa649",
+                    "65bd64fd19bce60b401cf9d0",
+                    "65bd65322d32baf543f90857",
+                    "65bd65616080dd83c4663229",
+                    "65bd65dcd834d8796ff702d2",
+                    "65bd662514ed70443b11a44c",
+                    "65bd66635e770c355ed96f01",
+                    "65bd669ae0b3b2e70db649aa",
+                    "65bd66cd66783926d5bb0d2f",
+                    "65bd66fb61efbfb9a9bcc0a9",
+                    "65bd672d2dd95dfda4b5dc66",
+                    "65bd67578697af865db4fbf7"
+                  ],
+                  "description": "Board's background image",
+                  "example": "65bd67578697af865db4fbf7"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Owner's ID",
+                  "example": "65be3614cd039701052f2de9"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "description": "Board created at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "description": "Board updated at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "updated",
+            "message": "Board updated successfully",
+            "data": {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "Board 1",
+                "icon": "project",
+                "backgroundImg": "65bd67578697af865db4fbf7",
+                "owner": "65be3614cd039701052f2de9",
+                "createdAt": "2024-02-06T19:03:24.206Z",
+                "updatedAt": "2024-02-06T19:03:24.206Z"
+              }
+        }
+      },
+      "DeleteBoardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "deleted"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Board deleted successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Board's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Board's title",
+                  "example": "Board 1"
+                },
+                "icon": {
+                  "type": "string",
+                  "enum": [ 
+                    "project",
+                    "star",
+                    "loading",
+                    "puzzle",
+                    "container",
+                    "lightning",
+                    "colors",
+                    "hexagon"
+                  ],
+                  "description": "Board's icon",
+                  "example": "project"
+                },
+                "backgroundImg": {
+                  "type": "string",
+                  "enum": [
+                    "null",
+                    "65bd63bfbe42db36576cef07",
+                    "65bd64121f0dd29462525104",
+                    "65bd646ad035ace54f9fbacc",
+                    "65bd64a469dbfedb2b4fa649",
+                    "65bd64fd19bce60b401cf9d0",
+                    "65bd65322d32baf543f90857",
+                    "65bd65616080dd83c4663229",
+                    "65bd65dcd834d8796ff702d2",
+                    "65bd662514ed70443b11a44c",
+                    "65bd66635e770c355ed96f01",
+                    "65bd669ae0b3b2e70db649aa",
+                    "65bd66cd66783926d5bb0d2f",
+                    "65bd66fb61efbfb9a9bcc0a9",
+                    "65bd672d2dd95dfda4b5dc66",
+                    "65bd67578697af865db4fbf7"
+                  ],
+                  "description": "Board's background image",
+                  "example": "65bd67578697af865db4fbf7"
+                },
+                "owner": {
+                  "type": "string",
+                  "description": "Owner's ID",
+                  "example": "65be3614cd039701052f2de9"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "description": "Board created at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "description": "Board updated at",
+                  "example": "2024-02-06T19:03:24.206Z"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "deleted",
+            "message": "Board deleted successfully",
+            "data": {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "Board 1",
+                "icon": "project",
+                "backgroundImg": "65bd67578697af865db4fbf7",
+                "owner": "65be3614cd039701052f2de9",
+                "createdAt": "2024-02-06T19:03:24.206Z",
+                "updatedAt": "2024-02-06T19:03:24.206Z"
+              }
+        }
+      },
+      "NotFoundBoard": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 404
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "not_found_board"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "The board with the specified ID was not found"
+            }
+        }
+      },
+      "GetAllColumnsResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "ok"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Column's title",
+                  "example": "Column 1"
+                },
+                "cards": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": [
+              {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "Column 1",
+                "cards": [
+                    "65be3614cd039701052f2de9",
+                    "65c7c600090f7ef8b93a5817",
+                    "65c7baec475a037290af81ca"
+                ]
+              },
+              {
+                "_id": "65c7c600090f7ef8b93a5817",
+                "title": "Column 2",
+                "cards": [
+                    "65be3614cd039701052f2de9",
+                    "65c7c600090f7ef8b93a5817",
+                    "65c7baec475a037290af81ca"
+                ]
+              }
+            ]
+        }
+      },
+      "CreateColumnRequest": {
+        "type": "object",
+        "required": ["title", "boardId"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Column's title",
+            "example": "Column 1"
+          },
+          "boardId": {
+            "type": "string",
+            "description": "Board's ID",
+            "example": "65bd63bfbe42db36576cef07"
+          }
+        }
+      },
+      "CreateColumnResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 201
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "created"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Column created successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Column's title",
+                  "example": "Column 1"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 201,
+            "code": "created",
+            "message": "Column created successfully",
+            "data": {
+              "_id": "65c280d17eb9882dc202fc16",
+              "title": "Column 1"
+            }
+        }
+      },
+      "BadDataBoardId": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 400
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "bad_data"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Incorrect 'boardId'. Cannot create a column in a board that does not exist"
+          }
+        }
+      },
+      "GetColumnResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "ok"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Success"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Column's title",
+                  "example": "Column 1"
+                },
+                "cards": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": {
+              "_id": "65c280d17eb9882dc202fc16",
+              "title": "Column 1",
+              "cards": [
+                  "65be3614cd039701052f2de9",
+                  "65c7c600090f7ef8b93a5817",
+                  "65c7baec475a037290af81ca"
+              ]
+            }
+        }
+      },
+      "BadId": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Bad request status",
+                "example": 400
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "bad_id"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Id is not valid"
+            }
+        }
+      },
+      "NotFoundColumn": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Bad request status",
+                "example": 404
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "not_found_column"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "The column with the specified ID was not found"
+            }
+        }
+      },
+      "UpdateColumnRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Column's title",
+            "example": "Column 1"
+          }
+        }
+      },
+      "UpdateColumnResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "updated"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Column updated successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Column's ID",
+                "example": "65c280d17eb9882dc202fc16"
+              },
+              "title": {
+                "type": "string",
+                "description": "Column's title",
+                "example": "Column 1"
+              },
+              "cards": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+            "status": 200,
+            "code": "updated",
+            "message": "Column updated successfully",
+            "data": {
+                "_id": "65c280d17eb9882dc202fc16",
+                "title": "IN PROGRESS"
+              }
+        }
+      },
+      "DeleteColumnResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "deleted"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Column deleted successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Column's title",
+                  "example": "Column 1"
+                }
+              }
+            }
+        },
+        "example": {
+          "status": 200,
+          "code": "deleted",
+          "message": "Column deleted successfully",
+          "data": {
+            "_id": "65c280d17eb9882dc202fc16",
+            "title": "Column 1"
+          }
+        }
+      },
+      "GetAllCardsResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "ok"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Card's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Card's title",
+                  "example": "Card 1"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Card's description",
+                  "example": "Here is Card 1 description"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "without",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "description": "Card's priority",
+                  "example": "without"
+                },
+                "deadline": {
+                  "type": "string",
+                  "description": "Final Date when card should be done",
+                  "example": null
+                },
+                "column": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c8989bd578a4f3c60f03ea"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": [
+              {
+                "_id": "65c898afd578a4f3c60f03f0",
+                "title": "Card 1",
+                "description": "Here is Card 1 description",
+                "priority": "without",
+                "deadline": null,
+                "column": "65c8989bd578a4f3c60f03ea"
+              },
+              {
+                "_id": "65c898afd578a4f3c60f03f0",
+                "title": "Card 2",
+                "description": "Here is Card 2 description",
+                "priority": "without",
+                "deadline": null,
+                "column": "65c8989bd578a4f3c60f03ea"
+              }
+            ]
+        }
+      },
+      "CreateCardRequest": {
+        "type": "object",
+        "required": ["title", "columnId"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Column's title",
+            "example": "Column 1"
+          },
+          "description": {
+            "type": "string",
+            "description": "Card's description",
+            "example": "Here is Card 1 description"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "without",
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Card's priority",
+            "example": "without"
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Final Date when card should be done",
+            "example": null
+          },
+          "columnId": {
+            "type": "string",
+            "description": "Column's ID",
+            "example": "65c8989bd578a4f3c60f03ea"
+          }
+        }
+      },
+      "CreateCardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 201
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "created"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Card created successfully"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Card's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Card's title",
+                  "example": "Card 1"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Card's description",
+                  "example": "Here is Card 1 description"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "without",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "description": "Card's priority",
+                  "example": "without"
+                },
+                "deadline": {
+                  "type": "string",
+                  "description": "Final Date when card should be done",
+                  "example": null
+                },
+                "column": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c8989bd578a4f3c60f03ea"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 201,
+            "code": "created",
+            "message": "Card created successfully",
+            "data": {
+              "_id": "65c898afd578a4f3c60f03f0",
+              "title": "Card 1",
+              "description": "Here is Card 1 description",
+              "priority": "without",
+              "deadline": null,
+              "column": "65c8989bd578a4f3c60f03ea"
+            }
+        }
+      },
+      "BadDataColumnId": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 400
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "bad_data"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Incorrect 'columnId'. Cannot create a card in a column that does not exist"
+          }
+        }
+      },
+      "GetCardResponse": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Status of response",
+                "example": 200
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "ok"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "Success"
+            },
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "Card's ID",
+                  "example": "65c280d17eb9882dc202fc16"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Card's title",
+                  "example": "Card 1"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Card's description",
+                  "example": "Here is Card 1 description"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "without",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "description": "Card's priority",
+                  "example": "without"
+                },
+                "deadline": {
+                  "type": "string",
+                  "description": "Final Date when card should be done",
+                  "example": null
+                },
+                "column": {
+                  "type": "string",
+                  "description": "Column's ID",
+                  "example": "65c8989bd578a4f3c60f03ea"
+                }
+              }
+            }
+        },
+        "example": {
+            "status": 200,
+            "code": "ok",
+            "message": "Success",
+            "data": {
+              "_id": "65c898afd578a4f3c60f03f0",
+              "title": "Card 1",
+              "description": "Here is Card 1 description",
+              "priority": "without",
+              "deadline": null,
+              "column": "65c8989bd578a4f3c60f03ea"
+            }
+        }
+      },
+      "NotFoundCard": {
+        "type": "object",
+        "properties": {
+            "status": {
+                "type": "number",
+                "description": "Bad request status",
+                "example": 404
+            },
+            "code": {
+                "type": "string",
+                "description": "Code of response",
+                "example": "not_found_card"
+            },
+            "message": {
+                "type": "string",
+                "description": "Message of response",
+                "example": "The card with the specified ID was not found"
+            }
+        }
+      },
+      "UpdateCardRequest": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Card's ID",
+            "example": "65c280d17eb9882dc202fc16"
+          },
+          "title": {
+            "type": "string",
+            "description": "Card's title",
+            "example": "Card 1"
+          },
+          "description": {
+            "type": "string",
+            "description": "Card's description",
+            "example": "Here is Card 1 description"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "without",
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Card's priority",
+            "example": "without"
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Final Date when card should be done",
+            "example": null
+          },
+          "column": {
+            "type": "string",
+            "description": "Column's ID",
+            "example": "65c8989bd578a4f3c60f03ea"
+          }
+        }
+      },
+      "UpdateCardResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "updated"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Card updated successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Card's ID",
+                "example": "65c280d17eb9882dc202fc16"
+              },
+              "title": {
+                "type": "string",
+                "description": "Card's title",
+                "example": "Card 1"
+              },
+              "description": {
+                "type": "string",
+                "description": "Card's description",
+                "example": "Here is Card 1 description"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "without",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "description": "Card's priority",
+                "example": "without"
+              },
+              "deadline": {
+                "type": "string",
+                "description": "Final Date when card should be done",
+                "example": null
+              },
+              "column": {
+                "type": "string",
+                "description": "Column's ID",
+                "example": "65c8989bd578a4f3c60f03ea"
+              }
+            }
+          }
+        },
+        "example": {
+            "status": 200,
+            "code": "updated",
+            "message": "Card updated successfully",
+            "data": {
+              "_id": "65c898afd578a4f3c60f03f0",
+              "title": "Card 2 TEST",
+              "description": "",
+              "priority": "without",
+              "deadline": null,
+              "column": "65c8989bd578a4f3c60f03ea"
+            }
+        }
+      },
+      "PatchCardRequest": {
+        "type": "object",
+        "properties": {
+          "columnId": {
+            "type": "string",
+            "description": "Column's ID",
+            "example": "65c8989bd578a4f3c60f03ea"
+          }
+        }
+      },
+      "PatchCardResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "moved"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Card moved successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Card's ID",
+                "example": "65c280d17eb9882dc202fc16"
+              },
+              "title": {
+                "type": "string",
+                "description": "Card's title",
+                "example": "Card 1"
+              },
+              "description": {
+                "type": "string",
+                "description": "Card's description",
+                "example": "Here is Card 1 description"
+              },
+              "priority": {
+                "type": "string",
+                "enum": [
+                  "without",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "description": "Card's priority",
+                "example": "without"
+              },
+              "deadline": {
+                "type": "string",
+                "description": "Final Date when card should be done",
+                "example": null
+              },
+              "column": {
+                "type": "string",
+                "description": "New Column's ID",
+                "example": "65c898afd578a4f3c60f03f0"
+              },
+              "prevColumn": {
+                "type": "string",
+                "description": "Previous Column's ID",
+                "example": "65c8989bd578a4f3c60f03ea"
+              }
+            }
+          }
+        },
+        "example": {
+            "status": 200,
+            "code": "moved",
+            "message": "Card moved successfully",
+            "data": {
+              "_id": "65c898afd578a4f3c60f03f0",
+              "title": "Card 2 TEST",
+              "description": "",
+              "priority": "without",
+              "deadline": null,
+              "column": "65c898afd578a4f3c60f03f0",
+              "prevColumn": "65c8989bd578a4f3c60f03ea"
+            }
+        }
+      },
+      "DeleteCardResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Status of response",
+              "example": 200
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "deleted"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Card deleted successfully"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "Card's ID",
+                "example": "65c280d17eb9882dc202fc16"
+              },
+              "title": {
+                "type": "string",
+                "description": "Card's title",
+                "example": "Card 1"
+              },
+              "column": {
+                "type": "string",
+                "description": "Column's ID",
+                "example": "65c8989bd578a4f3c60f03ea"
+              }
+            }
+          }
+        },
+        "example": {
+          "status": 200,
+          "code": "deleted",
+          "message": "Card deleted successfully",
+          "data": {
+            "_id": "65c280d17eb9882dc202fc16",
+            "title": "Card 1",
+            "column": "65c8989bd578a4f3c60f03ea"
+          }
+        }
+      },
+      "BadDataCardMove": {
+        "type": "object",
+        "properties": {
+          "status": {
+              "type": "number",
+              "description": "Bad request status",
+              "example": 400
+          },
+          "code": {
+              "type": "string",
+              "description": "Code of response",
+              "example": "bad_data"
+          },
+          "message": {
+              "type": "string",
+              "description": "Message of response",
+              "example": "Incorrect 'columnId'. Cannot move the card in a column that does not exist"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+            "userName": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Doe"
+            },
+            "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+            },
+            "theme": {
+              "type": "string",
+              "enum": [
+                "light",
+                "dark",
+                "violet"
+              ],
+              "description": "User's theme",
+              "example": "light"
+            },
+            "avatarCloudURL": {
+                "type": "string",
+                "description": "User's avatar URL",
+                "example": "http://res.cloudinary.com/duzywelcr/image/upload/v1707677603/avatars/65c08a94dcac052d973a19b7.jpg"
+            }
+        }
+      },
+      "PopulatedUser": {
+        "type": "object",
+        "properties": {
+            "_id": {
+                "type": "string",
+                "description": "User's ID",
+                "format": "65be3614cd039701052f2de9"
+            },
+            "userName": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Doe"
+            }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
